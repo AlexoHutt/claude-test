@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-950 text-gray-100 flex flex-col">
+  <div class="h-screen bg-gray-950 text-gray-100 flex flex-col">
     <header class="flex items-center gap-4 px-5 py-3 border-b border-gray-800 shrink-0">
       <NuxtLink to="/" class="text-amber-400 hover:text-amber-300 text-sm font-medium transition-colors">
         ← Back to Game
@@ -48,14 +48,21 @@
 </template>
 
 <script setup lang="ts">
-import { VueFlow, Background, Controls, MiniMap } from '@vue-flow/core'
-import type { Connection, EdgeChange } from '@vue-flow/core'
+import { markRaw } from 'vue'
+import { VueFlow } from '@vue-flow/core'
+import { Background } from '@vue-flow/background'
+import { Controls } from '@vue-flow/controls'
+import { MiniMap } from '@vue-flow/minimap'
+import type { Connection, EdgeChange, NodeTypesObject } from '@vue-flow/core'
 import AdminSceneNode from '~/components/AdminSceneNode.vue'
 import AdminChoiceNode from '~/components/AdminChoiceNode.vue'
 
 definePageMeta({ layout: false })
 
-const nodeTypes = { sceneNode: AdminSceneNode, choiceNode: AdminChoiceNode }
+const nodeTypes: NodeTypesObject = {
+  sceneNode: markRaw(AdminSceneNode) as NodeTypesObject[string],
+  choiceNode: markRaw(AdminChoiceNode) as NodeTypesObject[string],
+}
 
 const admin = useAdminStore()
 const { nodes, edges } = useAdminGraph()
@@ -66,21 +73,21 @@ const choiceCount = computed(() =>
 )
 
 function onConnect(connection: Connection) {
-  // source = choice:sceneId:idx, target = scene:sceneId
-  const sourceMatch = connection.source?.match(/^choice:(.+):(\d+)$/)
-  const targetMatch = connection.target?.match(/^scene:(.+)$/)
+  const { source, target } = connection
+  if (!source || !target) return
+  const sourceMatch = source.match(/^choice:(.+):(\d+)$/)
+  const targetMatch = target.match(/^scene:(.+)$/)
   if (sourceMatch && targetMatch) {
-    admin.updateChoiceTarget(sourceMatch[1], Number(sourceMatch[2]), targetMatch[1])
+    admin.updateChoiceTarget(sourceMatch[1]!, Number(sourceMatch[2]), targetMatch[1]!)
   }
 }
 
 function onEdgesChange(changes: EdgeChange[]) {
   for (const change of changes) {
     if (change.type === 'remove') {
-      // edge id format: e-choice:sceneId:idx-scene:targetId
       const match = change.id.match(/^e-choice:(.+):(\d+)-scene:/)
       if (match) {
-        admin.disconnectChoice(match[1], Number(match[2]))
+        admin.disconnectChoice(match[1]!, Number(match[2]))
       }
     }
   }

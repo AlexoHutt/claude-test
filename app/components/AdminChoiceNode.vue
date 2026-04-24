@@ -17,6 +17,7 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ inheritAttrs: false })
 import { Handle, Position } from '@vue-flow/core'
 
 const props = defineProps<{ data: { text: string; sceneId: string; idx: number } }>()

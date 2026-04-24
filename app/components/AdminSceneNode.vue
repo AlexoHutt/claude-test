@@ -1,7 +1,13 @@
 <template>
   <div class="bg-gray-800 border border-gray-600 rounded-lg overflow-hidden flex flex-col shadow-lg min-w-[220px]">
-    <div class="drag-handle flex items-center justify-center py-1 bg-gray-700 hover:bg-gray-600 cursor-grab active:cursor-grabbing transition-colors">
-      <span class="text-gray-400 text-xs tracking-widest select-none">⠿</span>
+    <div class="drag-handle flex items-center px-2 py-1 bg-gray-700 hover:bg-gray-600 cursor-grab active:cursor-grabbing transition-colors">
+      <span class="text-gray-400 text-xs tracking-widest select-none flex-1 text-center">⠿</span>
+      <button
+        class="text-gray-500 hover:text-red-400 text-xs transition-colors nodrag"
+        title="Delete scene"
+        @click.stop="admin.deleteScene(data.id)"
+        @mousedown.stop
+      >✕</button>
     </div>
     <div class="p-2 flex flex-col gap-1">
     <input

@@ -50,6 +50,16 @@ export const useAdminStore = defineStore('admin', {
       this.scenes[sceneId]?.choices.push({ text: 'New choice', nextScene: '' })
     },
 
+    deleteScene(id: string) {
+      delete this.scenes[id]
+      delete this.positions[id]
+      for (const s of Object.values(this.scenes)) {
+        for (const choice of s.choices) {
+          if (choice.nextScene === id) choice.nextScene = ''
+        }
+      }
+    },
+
     addScene() {
       const id = crypto.randomUUID()
       this.scenes[id] = { id, title: 'New Scene', text: '', choices: [] }

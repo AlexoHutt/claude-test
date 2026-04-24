@@ -18,7 +18,10 @@
         </div>
       </div>
 
-      <div v-else class="text-red-400">Scene "{{ game.currentSceneId }}" not found.</div>
+      <div v-else class="text-red-400">
+        <span v-if="status === 'pending'">Loading…</span>
+        <span v-else>Scene "{{ game.currentSceneId }}" not found.</span>
+      </div>
 
       <div class="mt-6 flex justify-between items-center text-sm text-gray-600">
         <span>Scene: {{ game.currentSceneId }}</span>
@@ -32,12 +35,16 @@
 </template>
 
 <script setup lang="ts">
-import scenes from '~/data/scenes.json'
-import type { Choice } from '~/stores/game'
+import type { Choice, Scene } from '~/stores/game'
 
 const game = useGameStore()
 
-const scene = computed(() => scenes[game.currentSceneId as keyof typeof scenes] ?? null)
+const { data, status } = await useFetch('/api/scenes')
+
+const scene = computed<Scene | null>(() => {
+  const s = data.value?.scenes[game.currentSceneId]
+  return s ?? null
+})
 
 function handleChoice(choice: Choice) {
   if (choice.effect) choice.effect(game.$state)

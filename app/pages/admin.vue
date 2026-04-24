@@ -26,6 +26,7 @@
     <div class="flex-1 min-h-0">
       <ClientOnly>
         <VueFlow
+          v-if="admin.loaded"
           :nodes="nodes"
           :edges="edges"
           :node-types="nodeTypes"
@@ -34,6 +35,7 @@
           class="w-full h-full"
           @connect="onConnect"
           @edges-change="onEdgesChange"
+          @node-drag-stop="onNodeDragStop"
         >
           <Background />
           <Controls />
@@ -48,12 +50,12 @@
 </template>
 
 <script setup lang="ts">
-import { markRaw } from 'vue'
+import { markRaw, onMounted } from 'vue'
 import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
-import type { Connection, EdgeChange, NodeTypesObject } from '@vue-flow/core'
+import type { Connection, EdgeChange, NodeDragEvent, NodeTypesObject } from '@vue-flow/core'
 import AdminSceneNode from '~/components/AdminSceneNode.vue'
 
 definePageMeta({ layout: false })
@@ -64,6 +66,10 @@ const nodeTypes: NodeTypesObject = {
 
 const admin = useAdminStore()
 const { nodes, edges } = useAdminGraph()
+
+onMounted(async () => {
+  await admin.fetchScenes()
+})
 
 const sceneCount = computed(() => Object.keys(admin.scenes).length)
 const choiceCount = computed(() =>
@@ -91,6 +97,12 @@ function onEdgesChange(changes: EdgeChange[]) {
       }
     }
   }
+}
+
+function onNodeDragStop({ node }: NodeDragEvent) {
+  const match = node.id.match(/^scene:(.+)$/)
+  if (!match) return
+  admin.updatePosition(match[1]!, node.position.x, node.position.y)
 }
 
 const saving = ref(false)

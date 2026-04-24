@@ -12,4 +12,10 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+
+  nitro: {
+    externals: {
+      external: ['better-sqlite3'],
+    },
+  },
 })

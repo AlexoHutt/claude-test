@@ -13,12 +13,14 @@ export function useAdminGraph() {
     const result: Node[] = [];
 
     for (const [id, scene] of Object.entries(admin.scenes)) {
-      const pos = scenePos[id] ?? { x: 0, y: 0 };
+      const stored = admin.positions[id]
+      const pos    = stored ?? scenePos[id] ?? { x: 0, y: 0 };
       result.push({
         id: `scene:${id}`,
         type: "sceneNode",
         position: { x: pos.x, y: pos.y },
         data: { id, text: scene.text },
+        dragHandle: '.drag-handle',
         style: { width: `${SCENE_W}px` },
       });
     }

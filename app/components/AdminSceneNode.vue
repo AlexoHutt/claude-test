@@ -1,5 +1,9 @@
 <template>
-  <div class="bg-gray-800 border border-gray-600 rounded-lg p-2 flex flex-col gap-1 shadow-lg nodrag min-w-[220px]">
+  <div class="bg-gray-800 border border-gray-600 rounded-lg overflow-hidden flex flex-col shadow-lg min-w-[220px]">
+    <div class="drag-handle flex items-center justify-center py-1 bg-gray-700 hover:bg-gray-600 cursor-grab active:cursor-grabbing transition-colors">
+      <span class="text-gray-400 text-xs tracking-widest select-none">⠿</span>
+    </div>
+    <div class="p-2 flex flex-col gap-1">
     <input
       :value="data.id"
       class="bg-transparent text-amber-400 font-mono text-xs font-bold w-full outline-none border-b border-gray-700 pb-1 focus:border-amber-500"
@@ -48,6 +52,7 @@
     >
       + Add Choice
     </button>
+    </div>
   </div>
   <Handle type="target" :position="Position.Left" />
 </template>

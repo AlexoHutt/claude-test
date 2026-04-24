@@ -19,9 +19,10 @@
     />
     <span class="text-gray-600 font-mono text-[10px] select-all">{{ data.id }}</span>
     <textarea
-      :value="data.text"
-      rows="3"
-      class="bg-transparent text-gray-200 text-xs w-full outline-none resize-none focus:text-white"
+      ref="textareaRef"
+      v-model="localText"
+      class="bg-transparent text-gray-200 text-xs w-full outline-none resize-none focus:text-white overflow-hidden"
+      @input="autoResize"
       @blur="onTextBlur"
       @mousedown.stop
     />
@@ -74,12 +75,27 @@ const admin = useAdminStore()
 const scene = computed(() => admin.scenes[props.data.id])
 const choices = computed(() => scene.value?.choices ?? [])
 
+const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const localText = ref(props.data.text)
+
+watch(() => scene.value?.text, (v) => { if (v !== undefined) localText.value = v })
+
+function autoResize() {
+  const el = textareaRef.value
+  if (!el) return
+  el.style.height = '0'
+  el.style.height = el.scrollHeight + 'px'
+}
+
+onMounted(autoResize)
+watch(localText, () => nextTick(autoResize))
+
 function onTitleBlur(e: FocusEvent) {
   admin.updateSceneTitle(props.data.id, (e.target as HTMLInputElement).value)
 }
 
-function onTextBlur(e: FocusEvent) {
-  admin.updateSceneText(props.data.id, (e.target as HTMLTextAreaElement).value)
+function onTextBlur() {
+  admin.updateSceneText(props.data.id, localText.value)
 }
 
 function onChoiceBlur(idx: number, e: FocusEvent) {

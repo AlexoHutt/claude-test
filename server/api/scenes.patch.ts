@@ -1,5 +1,6 @@
+import { sql, notInArray } from 'drizzle-orm'
 import { useDb } from '../db/index'
-import { scenes } from '../db/schema'
+import { scenes, nodePositions } from '../db/schema'
 import type { Scene } from '~/stores/game'
 
 export default defineEventHandler(async (event) => {
@@ -18,9 +19,22 @@ export default defineEventHandler(async (event) => {
       .values(rows)
       .onConflictDoUpdate({
         target: scenes.id,
-        set: { title: scenes.title, text: scenes.text, choices: scenes.choices },
+        set: {
+          title:   sql`excluded.title`,
+          text:    sql`excluded.text`,
+          choices: sql`excluded.choices`,
+        },
       })
       .run()
+  }
+
+  const incomingIds = Object.keys(body)
+  if (incomingIds.length > 0) {
+    db.delete(scenes).where(notInArray(scenes.id, incomingIds)).run()
+    db.delete(nodePositions).where(notInArray(nodePositions.sceneId, incomingIds)).run()
+  } else {
+    db.delete(scenes).run()
+    db.delete(nodePositions).run()
   }
 
   return { ok: true }

@@ -50,7 +50,7 @@ export const useAdminStore = defineStore('admin', {
       this.scenes[sceneId]?.choices.push({ text: 'New choice', nextScene: '' })
     },
 
-    deleteScene(id: string) {
+    async deleteScene(id: string) {
       delete this.scenes[id]
       delete this.positions[id]
       for (const s of Object.values(this.scenes)) {
@@ -58,6 +58,7 @@ export const useAdminStore = defineStore('admin', {
           if (choice.nextScene === id) choice.nextScene = ''
         }
       }
+      await $fetch('/api/scenes', { method: 'PATCH', body: this.scenes })
     },
 
     addScene() {

@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm'
 import { useDb } from '../db/index'
 import { nodePositions } from '../db/schema'
 
@@ -15,7 +16,7 @@ export default defineEventHandler(async (event) => {
     .values({ sceneId: id, x, y })
     .onConflictDoUpdate({
       target: nodePositions.sceneId,
-      set: { x: nodePositions.x, y: nodePositions.y },
+      set: { x: sql`excluded.x`, y: sql`excluded.y` },
     })
     .run()
 

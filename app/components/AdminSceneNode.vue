@@ -2,9 +2,10 @@
   <div class="bg-gray-800 border border-gray-600 rounded-lg p-2 flex flex-col gap-1 shadow-lg nodrag min-w-[220px]">
     <input
       :value="data.id"
-      class="bg-transparent text-amber-400 font-mono text-xs font-bold w-full outline-none border-b border-gray-700 pb-1"
-      readonly
+      class="bg-transparent text-amber-400 font-mono text-xs font-bold w-full outline-none border-b border-gray-700 pb-1 focus:border-amber-500"
       title="Scene ID"
+      @blur="onIdBlur"
+      @mousedown.stop
     />
     <textarea
       :value="data.text"
@@ -59,6 +60,10 @@ const props = defineProps<{ data: { id: string; text: string } }>()
 const admin = useAdminStore()
 
 const choices = computed(() => admin.scenes[props.data.id]?.choices ?? [])
+
+function onIdBlur(e: FocusEvent) {
+  admin.renameScene(props.data.id, (e.target as HTMLInputElement).value)
+}
 
 function onTextBlur(e: FocusEvent) {
   admin.updateSceneText(props.data.id, (e.target as HTMLTextAreaElement).value)

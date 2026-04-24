@@ -40,5 +40,20 @@ export const useAdminStore = defineStore("admin", {
       const choice = this.scenes[sceneId]?.choices[idx];
       if (choice) choice.nextScene = "";
     },
+
+    renameScene(oldId: string, newId: string) {
+      const trimmed = newId.trim();
+      if (!trimmed || trimmed === oldId || this.scenes[trimmed]) return;
+      const scene = this.scenes[oldId];
+      if (!scene) return;
+      scene.id = trimmed;
+      this.scenes[trimmed] = scene;
+      delete this.scenes[oldId];
+      for (const s of Object.values(this.scenes)) {
+        for (const choice of s.choices) {
+          if (choice.nextScene === oldId) choice.nextScene = trimmed;
+        }
+      }
+    },
   },
 });

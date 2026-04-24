@@ -55,13 +55,11 @@ import { Controls } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
 import type { Connection, EdgeChange, NodeTypesObject } from '@vue-flow/core'
 import AdminSceneNode from '~/components/AdminSceneNode.vue'
-import AdminChoiceNode from '~/components/AdminChoiceNode.vue'
 
 definePageMeta({ layout: false })
 
 const nodeTypes: NodeTypesObject = {
   sceneNode: markRaw(AdminSceneNode) as NodeTypesObject[string],
-  choiceNode: markRaw(AdminChoiceNode) as NodeTypesObject[string],
 }
 
 const admin = useAdminStore()
@@ -73,19 +71,21 @@ const choiceCount = computed(() =>
 )
 
 function onConnect(connection: Connection) {
-  const { source, target } = connection
+  const { source, target, sourceHandle } = connection
   if (!source || !target) return
-  const sourceMatch = source.match(/^choice:(.+):(\d+)$/)
+  const sceneMatch = source.match(/^scene:(.+)$/)
+  const handleMatch = sourceHandle?.match(/^choice:(\d+)$/)
   const targetMatch = target.match(/^scene:(.+)$/)
-  if (sourceMatch && targetMatch) {
-    admin.updateChoiceTarget(sourceMatch[1]!, Number(sourceMatch[2]), targetMatch[1]!)
+  if (sceneMatch && handleMatch && targetMatch) {
+    admin.updateChoiceTarget(sceneMatch[1]!, Number(handleMatch[1]), targetMatch[1]!)
   }
 }
 
 function onEdgesChange(changes: EdgeChange[]) {
   for (const change of changes) {
     if (change.type === 'remove') {
-      const match = change.id.match(/^e-choice:(.+):(\d+)-scene:/)
+      // edge id: e-scene:{sceneId}:{idx}-scene:{targetId}
+      const match = change.id.match(/^e-scene:(.+):(\d+)-scene:/)
       if (match) {
         admin.disconnectChoice(match[1]!, Number(match[2]))
       }

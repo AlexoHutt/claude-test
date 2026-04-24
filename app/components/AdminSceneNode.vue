@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-gray-800 border border-gray-600 rounded-lg p-2 flex flex-col gap-1 shadow-lg nodrag">
+  <div class="bg-gray-800 border border-gray-600 rounded-lg p-2 flex flex-col gap-1 shadow-lg nodrag min-w-[220px]">
     <input
       :value="data.id"
-      class="bg-transparent text-amber-400 font-mono text-xs font-bold w-full outline-none border-b border-gray-700 pb-1 focus:border-amber-500"
+      class="bg-transparent text-amber-400 font-mono text-xs font-bold w-full outline-none border-b border-gray-700 pb-1"
       readonly
       title="Scene ID"
     />
@@ -13,9 +13,42 @@
       @blur="onTextBlur"
       @mousedown.stop
     />
+
+    <div class="flex flex-col gap-1 mt-1">
+      <div
+        v-for="(choice, idx) in choices"
+        :key="idx"
+        class="relative flex items-center gap-1 bg-amber-900 border border-amber-700 rounded px-2 py-1"
+      >
+        <input
+          :value="choice.text"
+          class="bg-transparent text-amber-100 text-xs w-full outline-none focus:text-white"
+          @blur="onChoiceBlur(idx, $event)"
+          @mousedown.stop
+        />
+        <button
+          class="text-amber-500 hover:text-red-400 text-xs shrink-0 transition-colors"
+          title="Delete choice"
+          @click.stop="admin.removeChoice(data.id, idx)"
+        >×</button>
+        <Handle
+          :id="`choice:${idx}`"
+          type="source"
+          :position="Position.Right"
+          class="!right-[-8px]"
+        />
+      </div>
+    </div>
+
+    <button
+      class="mt-1 text-xs text-gray-500 hover:text-amber-400 transition-colors text-left"
+      @click.stop="admin.addChoice(data.id)"
+      @mousedown.stop
+    >
+      + Add Choice
+    </button>
   </div>
   <Handle type="target" :position="Position.Left" />
-  <Handle type="source" :position="Position.Right" />
 </template>
 
 <script setup lang="ts">
@@ -25,7 +58,13 @@ import { Handle, Position } from '@vue-flow/core'
 const props = defineProps<{ data: { id: string; text: string } }>()
 const admin = useAdminStore()
 
+const choices = computed(() => admin.scenes[props.data.id]?.choices ?? [])
+
 function onTextBlur(e: FocusEvent) {
   admin.updateSceneText(props.data.id, (e.target as HTMLTextAreaElement).value)
+}
+
+function onChoiceBlur(idx: number, e: FocusEvent) {
+  admin.updateChoiceText(props.data.id, idx, (e.target as HTMLInputElement).value)
 }
 </script>

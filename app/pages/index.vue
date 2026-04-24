@@ -22,7 +22,10 @@
 
       <div class="mt-6 flex justify-between items-center text-sm text-gray-600">
         <span>Scene: {{ game.currentSceneId }}</span>
-        <button class="hover:text-gray-400 transition-colors" @click="game.reset()">Restart</button>
+        <div class="flex gap-4">
+          <NuxtLink to="/admin" class="hover:text-gray-400 transition-colors">Admin</NuxtLink>
+          <button class="hover:text-gray-400 transition-colors" @click="game.reset()">Restart</button>
+        </div>
       </div>
     </div>
   </div>

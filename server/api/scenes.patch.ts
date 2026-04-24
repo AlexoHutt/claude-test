@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const rows = Object.values(body).map((scene) => ({
     id:      scene.id,
+    title:   scene.title,
     text:    scene.text,
     choices: JSON.stringify(scene.choices),
   }))
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event) => {
       .values(rows)
       .onConflictDoUpdate({
         target: scenes.id,
-        set: { text: scenes.text, choices: scenes.choices },
+        set: { title: scenes.title, text: scenes.text, choices: scenes.choices },
       })
       .run()
   }

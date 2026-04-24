@@ -10,10 +10,11 @@ export default defineEventHandler(() => {
   const sceneRows = db.select().from(scenes).all()
   const posRows   = db.select().from(nodePositions).all()
 
-  const scenesMap: Record<string, { id: string; text: string; choices: Choice[] }> = {}
+  const scenesMap: Record<string, { id: string; title: string; text: string; choices: Choice[] }> = {}
   for (const row of sceneRows) {
     scenesMap[row.id] = {
       id:      row.id,
+      title:   row.title,
       text:    row.text,
       choices: JSON.parse(row.choices) as Choice[],
     }

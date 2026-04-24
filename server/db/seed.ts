@@ -8,8 +8,10 @@ export function seedIfEmpty() {
   const existing = db.select().from(scenes).limit(1).all()
   if (existing.length > 0) return
 
-  const rows = Object.values(rawScenes as Record<string, Scene>).map((scene) => ({
+  type SeedScene = Omit<Scene, 'title'> & { title?: string }
+  const rows = Object.values(rawScenes as unknown as Record<string, SeedScene>).map((scene) => ({
     id:      scene.id,
+    title:   scene.title ?? scene.id,
     text:    scene.text,
     choices: JSON.stringify(scene.choices),
   }))

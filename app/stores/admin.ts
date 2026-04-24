@@ -22,6 +22,11 @@ export const useAdminStore = defineStore('admin', {
       await $fetch('/api/positions', { method: 'PATCH', body: { id, x, y } })
     },
 
+    updateSceneTitle(id: string, title: string) {
+      const scene = this.scenes[id]
+      if (scene) scene.title = title
+    },
+
     updateSceneText(id: string, text: string) {
       const scene = this.scenes[id]
       if (scene) scene.text = text
@@ -46,8 +51,8 @@ export const useAdminStore = defineStore('admin', {
     },
 
     addScene() {
-      const id = `scene_${Date.now()}`
-      this.scenes[id] = { id, text: 'New scene', choices: [] }
+      const id = crypto.randomUUID()
+      this.scenes[id] = { id, title: 'New Scene', text: '', choices: [] }
     },
 
     disconnectChoice(sceneId: string, idx: number) {

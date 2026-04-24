@@ -9,6 +9,7 @@ export interface Choice {
 
 export interface Scene {
   id: string
+  title: string
   text: string
   choices: Choice[]
 }

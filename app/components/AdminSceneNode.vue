@@ -5,12 +5,13 @@
     </div>
     <div class="p-2 flex flex-col gap-1">
     <input
-      :value="data.id"
-      class="bg-transparent text-amber-400 font-mono text-xs font-bold w-full outline-none border-b border-gray-700 pb-1 focus:border-amber-500"
-      title="Scene ID"
-      @blur="onIdBlur"
+      :value="scene?.title ?? data.id"
+      class="bg-transparent text-white text-sm font-semibold w-full outline-none border-b border-gray-700 pb-1 focus:border-amber-500 placeholder-gray-500"
+      placeholder="Scene title"
+      @blur="onTitleBlur"
       @mousedown.stop
     />
+    <span class="text-gray-600 font-mono text-[10px] select-all">{{ data.id }}</span>
     <textarea
       :value="data.text"
       rows="3"
@@ -64,10 +65,11 @@ import { Handle, Position } from '@vue-flow/core'
 const props = defineProps<{ data: { id: string; text: string } }>()
 const admin = useAdminStore()
 
-const choices = computed(() => admin.scenes[props.data.id]?.choices ?? [])
+const scene = computed(() => admin.scenes[props.data.id])
+const choices = computed(() => scene.value?.choices ?? [])
 
-function onIdBlur(e: FocusEvent) {
-  admin.renameScene(props.data.id, (e.target as HTMLInputElement).value)
+function onTitleBlur(e: FocusEvent) {
+  admin.updateSceneTitle(props.data.id, (e.target as HTMLInputElement).value)
 }
 
 function onTextBlur(e: FocusEvent) {

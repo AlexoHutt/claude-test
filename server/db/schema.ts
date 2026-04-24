@@ -2,6 +2,7 @@ import { sqliteTable, text, real, integer } from 'drizzle-orm/sqlite-core'
 
 export const scenes = sqliteTable('scenes', {
   id:      text('id').primaryKey(),
+  title:   text('title').notNull().default(''),
   text:    text('text').notNull(),
   choices: text('choices').notNull(), // JSON: Choice[]
 })
